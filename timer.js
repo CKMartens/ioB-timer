@@ -7,7 +7,7 @@ Schaltaktoren zeitgesteuert schalten
   02.10.2019:   V0.1.0  Funktionale Testversion
   04.10.2019:   V0.1.5  Bugfixes Countdown, Bugfix Aktorhandling, Restlaufzeit erhält führende '0'
   05.10.2019:   V0.2.0  Für VIS Timer in Datenpunkte für Std, Min, Sek aufgeteilt
-
+  09.10.2019:   V0.2.1  Fehler im Beenden des Countdown Intervalles behoben; Unterbinen negativer Countdown Einträge
   to do:
 
 
@@ -141,8 +141,15 @@ on({id: TIMER_START, change: "ne"}, function (obj) {
       i_downSek = (i_downMSek / 1000) - (i_downMin * 60) - (i_downStd * 3600);
       s_RSek = String(i_downSek);
       if (i_downSek <= 9) s_RSek = String(('0' + i_downSek));
+    if (i_downMSek <= 0) {                                                      // Wenn die Zeit auf 0 ist kein negativen Einträge
+      setState(TIMER_COUNTDOWN, '00:00:00');
+      clearInterval(countdown);
+      countdown = null;
+      setState(TIMER_COUNTDOWN, '00:00:00');
+    } else {
+      setState(TIMER_COUNTDOWN, s_RStd+':'+s_RMin+':'+s_RSek);
+    }
 
-	  setState(TIMER_COUNTDOWN, s_RStd+':'+s_RMin+':'+s_RSek);
     }, 1000);
 
     setState(s_Aktor, true);
@@ -152,10 +159,10 @@ on({id: TIMER_START, change: "ne"}, function (obj) {
     timer = setTimeout(function() {
         setState(TIMER_ABGELAUFEN, true);
         setState(TIMER_START, false);
-        timer = null;
         clearTimeout(timer);
-        countdown = null;
+        timer = null;
         clearInterval(countdown);
+        countdown = null;
         setState(TIMER_COUNTDOWN, '00:00:00');
     }, i_MSek);
   } else {
