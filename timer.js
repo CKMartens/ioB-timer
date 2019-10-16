@@ -127,7 +127,7 @@ on({id: TIMER_START, change: "ne"}, function (obj) {
     i_downMSek = i_MSek;
 
     // Countdown für Restlaufzeit
-	countdown = setInterval(function () {
+		countdown = setInterval(function () {
       i_downMSek = i_downMSek - 1000;
 
       i_downStd = Math.floor(i_downMSek / 3600000);
@@ -141,32 +141,32 @@ on({id: TIMER_START, change: "ne"}, function (obj) {
       i_downSek = (i_downMSek / 1000) - (i_downMin * 60) - (i_downStd * 3600);
       s_RSek = String(i_downSek);
       if (i_downSek <= 9) s_RSek = String(('0' + i_downSek));
-    if (i_downMSek <= 0) {                                                      // Wenn die Zeit auf 0 ist kein negativen Einträge
-      setState(TIMER_COUNTDOWN, '00:00:00');
-      clearInterval(countdown);
-      countdown = null;
-      setState(TIMER_COUNTDOWN, '00:00:00');
-    } else {
-      setState(TIMER_COUNTDOWN, s_RStd+':'+s_RMin+':'+s_RSek);
-    }
-
+    	if (i_downMSek <= 0) {                                                    // Wenn die Zeit auf 0 ist kein negativen Einträge
+      	setState(TIMER_COUNTDOWN, '00:00:00');
+      	clearInterval(countdown);
+      	countdown = null;
+    	} else {
+      	setState(TIMER_COUNTDOWN, s_RStd+':'+s_RMin+':'+s_RSek);
+    	}
     }, 1000);
 
     setState(s_Aktor, true);
     if (DEBUG) log('Timer für '+i_Min+' Minuten gestartet, Aktor '+s_Aktor+' eingeschaltet');
 
     // Timer starten
-    timer = setTimeout(function() {
+    timer = setTimeout(function() {                                             //Timer wird für x MSek gestartet und nach ablauf...
         setState(TIMER_ABGELAUFEN, true);
         setState(TIMER_START, false);
-        clearTimeout(timer);
+        clearTimeout(timer);                                                    //...Countdown und Timer löschen
         timer = null;
         clearInterval(countdown);
         countdown = null;
-        setState(TIMER_COUNTDOWN, '00:00:00');
+        setState(TIMER_COUNTDOWN, '00:00:00');                                  //...Zeit auf 00:00:00 setzen
+        var s_Aktor = getState(TIMER_AKTOR).val;
+        setState(s_Aktor, false);                                               //...Aktor ausschalten
     }, i_MSek);
   } else {
-      if (getState(TIMER_ABGELAUFEN).val == false) {
+      if (getState(TIMER_ABGELAUFEN).val == false) {                            //Timer manuell ausgeschaltet
         var s_Aktor = getState(TIMER_AKTOR).val;
         setState(s_Aktor, false);
         setState(TIMER_ABGELAUFEN, true);
